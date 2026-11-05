@@ -3,6 +3,48 @@
 Ứng dụng đồ án phân loại ảnh MRI não thành Glioma, Meningioma, Pituitary Tumor và No Tumor.
 Giao diện được giữ từ bản mẫu NeuroScan: Phân tích ảnh, So sánh mô hình, Đánh giá mô hình và Thông tin dự án.
 
+## Chạy trên Mac với ResNet50
+
+Mở thư mục dự án trong VS Code bằng **File → Open Folder**. Terminal cần ở
+thư mục chứa `server.py`, `app.py` và `requirements-web.txt`.
+
+1. Cài Python 3.12 nếu máy chưa có bằng `brew install python@3.12`.
+2. Với bản lấy từ GitHub, đặt checkpoint `resnet50_best.pth` của nhóm vào
+   `models/resnet50/` và đổi tên thành `model.pth`. Cấu hình đã có sẵn trong repo.
+   Gói `NeuroScan_ResNet50_Mac.zip` đã được bàn giao kèm checkpoint.
+3. Mở `Mo_NeuroScan.command`. Lần đầu chương trình tạo `.venv312`, cài thư viện
+   và kiểm tra mô hình. Nếu macOS chặn mở trực tiếp, chạy trong Terminal
+
+   ```sh
+   bash Mo_NeuroScan.command
+   ```
+
+   Có thể gõ `bash` và một dấu cách, kéo file `.command` từ Finder vào Terminal,
+   rồi nhấn Enter. Script tự chuyển vào thư mục dự án.
+4. Khi Terminal hiện `Uvicorn running`, giữ Terminal mở và vào
+   [NeuroScan tại cổng 8002](http://127.0.0.1:8002).
+5. Chọn **Mô hình thật → ResNet50**, tải ảnh MRI JPG/PNG từ tập test của nhóm
+   và bấm **Chạy dự đoán**.
+
+Script dùng cổng `8002`. Nếu trước đó đã chạy bản ở cổng `8001`, mở lại đúng
+địa chỉ trên để dùng bản vừa khởi động. Dừng máy chủ bằng **Ctrl+C** trong Terminal.
+Script mặc định dùng CPU. Có thể chọn thiết bị bằng biến `NEUROSCAN_DEVICE`.
+
+Nếu mục chọn mô hình báo `Thiếu model.pth`, kiểm tra checkpoint nằm tại
+`models/resnet50/model.pth` trong chính thư mục đang chạy. Nếu báo thiếu thư viện,
+chạy lại lệnh bên dưới rồi mở lại script
+
+```sh
+.venv312/bin/python -m pip install -r requirements-web.txt -r requirements-pytorch.txt
+```
+
+ResNet50 của nhóm dùng đầu phân loại `Dropout(0.3) → Linear(4)`. Bộ nạp hỗ trợ
+cả đầu này và đầu `Linear(4)` chuẩn. Cấu hình sử dụng RGB, resize bilinear
+224 × 224, chuẩn hóa ImageNet và thứ tự đầu ra **Glioma → Meningioma → No Tumor →
+Pituitary Tumor**, khớp pipeline huấn luyện.
+
+Để xem mục **Đánh giá**, bổ sung `metrics.json` theo định dạng bên dưới.
+
 ## Chạy bản chính: giao diện NeuroScan + FastAPI
 
 ```sh

@@ -1,8 +1,14 @@
 .DS_Store
-.venv/
+.venv*/
 __pycache__/
 *.pyc
 .env
 data/
 uploads/
 models/*/
+!models/resnet50/
+models/resnet50/*
+!models/resnet50/model_config.json
+*.pth
+*.onnx
+*.zip

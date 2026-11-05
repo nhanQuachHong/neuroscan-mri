@@ -21,6 +21,8 @@ def load_model(path, modified, architecture):
         raise ValueError("Checkpoint phải chứa state_dict của mô hình.")
     if all(k.startswith("module.") for k in checkpoint):
         checkpoint = {k.removeprefix("module."): v for k, v in checkpoint.items()}
+    if architecture == "resnet50" and {"fc.1.weight", "fc.1.bias"} <= checkpoint.keys():
+        network.fc = torch.nn.Sequential(torch.nn.Dropout(0.3), network.fc)
     network.load_state_dict(checkpoint, strict=True)
     setting = os.environ.get("NEUROSCAN_DEVICE", "auto").lower()
     if setting not in ("auto", "cpu", "cuda", "mps"):
