@@ -3,47 +3,63 @@
 Ứng dụng đồ án phân loại ảnh MRI não thành Glioma, Meningioma, Pituitary Tumor và No Tumor.
 Giao diện được giữ từ bản mẫu NeuroScan: Phân tích ảnh, So sánh mô hình, Đánh giá mô hình và Thông tin dự án.
 
-## Chạy trên Mac với ResNet50
+## Mở nhanh trên Mac
 
-Mở thư mục dự án trong VS Code bằng **File → Open Folder**. Terminal cần ở
-thư mục chứa `server.py`, `app.py` và `requirements-web.txt`.
-
-1. Cài Python 3.12 nếu máy chưa có bằng `brew install python@3.12`.
-2. Với bản lấy từ GitHub, đặt checkpoint `resnet50_best.pth` của nhóm vào
-   `models/resnet50/` và đổi tên thành `model.pth`. Cấu hình đã có sẵn trong repo.
-   Gói `NeuroScan_ResNet50_Mac.zip` đã được bàn giao kèm checkpoint.
-3. Mở `Mo_NeuroScan.command`. Lần đầu chương trình tạo `.venv312`, cài thư viện
-   và kiểm tra mô hình. Nếu macOS chặn mở trực tiếp, chạy trong Terminal
-
-   ```sh
-   bash Mo_NeuroScan.command
-   ```
-
-   Có thể gõ `bash` và một dấu cách, kéo file `.command` từ Finder vào Terminal,
-   rồi nhấn Enter. Script tự chuyển vào thư mục dự án.
-4. Khi Terminal hiện `Uvicorn running`, giữ Terminal mở và vào
-   [NeuroScan tại cổng 8002](http://127.0.0.1:8002).
-5. Chọn **Mô hình thật → ResNet50**, tải ảnh MRI JPG/PNG từ tập test của nhóm
-   và bấm **Chạy dự đoán**.
-
-Script dùng cổng `8002`. Nếu trước đó đã chạy bản ở cổng `8001`, mở lại đúng
-địa chỉ trên để dùng bản vừa khởi động. Dừng máy chủ bằng **Ctrl+C** trong Terminal.
-Script mặc định dùng CPU. Có thể chọn thiết bị bằng biến `NEUROSCAN_DEVICE`.
-
-Nếu mục chọn mô hình báo `Thiếu model.pth`, kiểm tra checkpoint nằm tại
-`models/resnet50/model.pth` trong chính thư mục đang chạy. Nếu báo thiếu thư viện,
-chạy lại lệnh bên dưới rồi mở lại script
+Trong Terminal tại thư mục dự án, chạy:
 
 ```sh
-.venv312/bin/python -m pip install -r requirements-web.txt -r requirements-pytorch.txt
+bash Mo_NeuroScan.command
 ```
 
-ResNet50 của nhóm dùng đầu phân loại `Dropout(0.3) → Linear(4)`. Bộ nạp hỗ trợ
-cả đầu này và đầu `Linear(4)` chuẩn. Cấu hình sử dụng RGB, resize bilinear
-224 × 224, chuẩn hóa ImageNet và thứ tự đầu ra **Glioma → Meningioma → No Tumor →
-Pituitary Tumor**, khớp pipeline huấn luyện.
+Khi thấy `Uvicorn running`, mở http://127.0.0.1:8002 và giữ Terminal mở.
+Script dùng Python 3.12, tự tạo `.venv312` và cài các thư viện còn thiếu khi có mạng.
+Mặc định dùng CPU. Dừng ứng dụng bằng Ctrl+C.
 
-Để xem mục **Đánh giá**, bổ sung `metrics.json` theo định dạng bên dưới.
+Nếu chưa có checkpoint, giao diện vẫn mở ở chế độ minh họa và API thật báo thiếu mô hình.
+Đặt `resnet50_best.pth` của nhóm cạnh `Mo_NeuroScan.command` rồi mở lại; script sao chép
+checkpoint vào `models/resnet50/model.pth` nếu vị trí đó còn trống. Cũng có thể đặt trực tiếp
+file `model.pth` tại vị trí này. Không ghi đè checkpoint hiện có. Khi có checkpoint nhưng
+kiểm tra nạp mô hình thất bại, script dừng và hiển thị lỗi thay vì báo sẵn sàng giả.
+
+Để dự đoán, chọn **Mô hình thật → ResNet50**, tải ảnh JPG/PNG và chạy dự đoán.
+Thứ tự nhãn đã cấu hình là **Glioma → Meningioma → No Tumor → Pituitary Tumor**.
+Các thông số RGB, bilinear 224 × 224 và chuẩn hóa ImageNet là hợp đồng đầu vào đang có;
+cần đối chiếu với `transforms.py` từ gói huấn luyện và cùng ảnh test để xác nhận.
+
+## Khôi phục Git cho bản giải nén
+
+Bản giải nén không có `.git`, vì vậy `git fetch` hoặc `git pull` không hoạt động.
+Chạy một lần trong Terminal thường trên Mac:
+
+```sh
+bash Khoi_phuc_Git.command
+```
+
+Script tạo metadata Git, nối với `nhanQuachHong/neuroscan-mri`, tải nhánh
+`feat/mri-demo-application` và đặt nhánh theo dõi. Nó chỉ đặt HEAD và index, giữ nguyên
+mọi file làm việc; các khác biệt cục bộ vẫn xuất hiện trong `git status`. Script dừng
+nếu đã có `.git`. Nếu mất mạng giữa chừng sau khi tạo `.git`, chạy `git fetch origin`
+và hoàn tất thiết lập nhánh bằng tay; không xóa `.git` để chạy lại nếu có lịch sử cần giữ.
+
+## Nguồn notebook và kết quả được bàn giao
+
+Xem [notebooks/README.md](notebooks/README.md). Notebook đã được bỏ đầu ra và hình nhúng;
+giữ nguyên các ô nguồn. Kết quả bàn giao có 985 ảnh test, Accuracy 95,43% và Macro F1 94,65%.
+Đây là kết quả đọc từ file đánh giá gốc, không phải kết quả chạy lại trên máy này.
+Mã huấn luyện trong `mri_pipeline_phan2_Tri.zip`, checkpoint, dữ liệu và split chính thức
+chưa đi kèm repo; notebook một mình chưa đủ tái lập huấn luyện.
+
+Ngoài test ONNX bên dưới, kiểm tra riêng đường PyTorch bằng:
+
+```sh
+python -m pip install -r requirements-web.txt -r requirements-pytorch.txt
+python -m unittest discover -s tests -p test_pytorch.py -v
+```
+
+Ba test PyTorch dùng trọng số ngẫu nhiên tạo tạm, kiểm tra checkpoint bọc trong
+`model_state_dict` có tiền tố `module.`, đầu Dropout → Linear, tiền xử lý so với torchvision,
+xác suất trả về qua API, ảnh lỗi và checkpoint bị thiếu. Test không xác nhận trọng số
+được huấn luyện của nhóm hay độ chính xác MRI.
 
 ## Chạy bản chính: giao diện NeuroScan + FastAPI
 
@@ -76,6 +92,21 @@ là state_dict trực tiếp hoặc nằm trong trường state_dict/model_state
 Nếu nhóm dùng timm, kiến trúc tùy biến hoặc đầu phân loại khác, hãy xuất ONNX
 hoặc điều chỉnh bộ dựng mô hình tương ứng; chỉ đổi đuôi file sẽ không chạy được.
 Bản web so sánh tối đa ba gói mô hình trong models/.
+
+## Chạy bản Streamlit theo yêu cầu đồ án
+
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements-streamlit.txt
+python -m streamlit run streamlit_app.py --server.address 127.0.0.1
+```
+
+Mở địa chỉ Streamlit in trong Terminal (thường là http://127.0.0.1:8501).
+Chọn **Minh họa (dummy)**, bật **Dùng hình mô phỏng**, sau đó chạy dự đoán hoặc
+so sánh trên cùng ảnh. Chế độ minh họa có ba tên mô hình và chỉ số giả lập, không cần trọng số.
+Bộ cài Streamlit đã gồm ONNX Runtime. Để chạy thật, đặt gói mô hình
+như hướng dẫn bên dưới và chọn **Mô hình thật**. Có thể chọn tối đa ba mô hình mỗi lần so sánh.
 
 ## Gắn mô hình ONNX (phương án tương thích)
 
@@ -168,3 +199,10 @@ Dùng ID thư mục `resnet50`, `efficientnet_b0` và `swin` để bảng so sá
 bản đã resize trước khi chuẩn hóa tensor. Chế độ minh họa không hiển thị số liệu
 đánh giá nghiên cứu. Mặc định PyTorch ưu tiên CUDA, sau đó MPS rồi CPU.
 Nếu gặp phép toán chưa được hỗ trợ trên MPS, khởi động với `NEUROSCAN_DEVICE=cpu`.
+
+## Gắn checkpoint ResNet50 của nhóm
+
+Gói này có sẵn cấu hình và chỉ số ResNet50 của lượt đánh giá Bước 9. Đặt
+`resnet50_best.pth` của nhóm vào `models/resnet50/`, đổi tên thành `model.pth`,
+rồi chạy `python app.py --verify-models`. Tải lại giao diện và chọn **Mô hình thật**.
+Checkpoint được bàn giao riêng; không đưa vào Git.
