@@ -12,6 +12,7 @@
     224
   ],
   "resize": "bilinear",
+  "exif_transpose": false,
   "channels": 3,
   "layout": "NCHW",
   "scale": 0.00392156862745098,

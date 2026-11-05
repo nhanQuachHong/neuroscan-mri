@@ -6,7 +6,7 @@
 
 Thứ tự lớp của lượt đánh giá là `glioma`, `meningioma`, `no_tumor`, `pituitary`; phải giữ đúng thứ tự đầu ra khi dùng checkpoint.
 
-Notebook còn phụ thuộc `mri_pipeline_phan2_Tri.zip` (gồm train.py, models.py, transforms.py, dataset.py và các tiện ích), `split.csv` chính thức và dataset BRISC. Các file mã huấn luyện trong ZIP chưa được bàn giao vào repo này, nên chỉ thêm notebook chưa đủ tái lập huấn luyện hoặc xác nhận toàn bộ tiền xử lý. Không suy ra các phép xử lý ảnh còn thiếu từ tên kiến trúc.
+Mã gốc từ `mri_pipeline_phan2_Tri.zip` đã được giải nén nguyên nội dung vào `../training/mri_pipeline/`, gồm train.py, models.py, transforms.py, dataset.py, config.py và các tiện ích. Notebook vẫn cần `split.csv` chính thức và dataset BRISC để tái lập huấn luyện. Khi chạy Colab theo ô nguồn gốc, đặt ZIP mã nguồn trong Drive theo chỉ dẫn Bước 2.
 
-Checkpoint phải được bàn giao riêng, đặt tại `models/resnet50/model.pth`. Chạy `python app.py --verify-models` chỉ xác nhận nạp và suy luận trên ảnh tổng hợp, không xác nhận accuracy hoặc đồng nhất với notebook. Đối chiếu xác suất bốn lớp trên cùng ảnh test bằng chính mã huấn luyện trước khi báo kết quả demo thật.
+Checkpoint được cài riêng tại `models/resnet50/model.pth`, không đưa vào Git. Chạy `python app.py --verify-models` xác nhận nạp và suy luận trên ảnh tổng hợp. `scripts/verify_resnet50_pipeline.py` so sánh trực tiếp tiền xử lý và xác suất từ checkpoint thật giữa mã huấn luyện và ứng dụng. Báo cáo trong `verification/resnet50_pipeline.json` đã đạt cả bốn đầu vào tổng hợp; chưa đánh giá lại accuracy trên ảnh MRI. Chạy thêm với `--image` trên ảnh test để kiểm tra dữ liệu thật.
 

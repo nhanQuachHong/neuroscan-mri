@@ -46,6 +46,7 @@ def config_for(folder):
           "output_type phải là logits hoặc probabilities.")
     check(c.get("resize") in ("bilinear", "bicubic", "nearest", "lanczos"),
           "resize không được hỗ trợ.")
+    check(type(c.get("exif_transpose", True)) is bool, "exif_transpose phải là boolean.")
     check(isinstance(size, list) and len(size) == 2
           and all(type(x) is int and 1 <= x <= 2048 for x in size),
           "size phải là [rộng, cao], mỗi chiều từ 1 đến 2048.")
@@ -104,7 +105,9 @@ def resized_image(payload, c):
     with Image.open(BytesIO(payload)) as image:
         if image.format not in ("JPEG", "PNG") or image.width * image.height > 20_000_000:
             raise ValueError("Chỉ hỗ trợ JPG/PNG tối đa 20 triệu pixel.")
-        image = ImageOps.exif_transpose(image).convert("RGB" if c["channels"] == 3 else "L")
+        if c.get("exif_transpose", True):
+            image = ImageOps.exif_transpose(image)
+        image = image.convert("RGB" if c["channels"] == 3 else "L")
         return image.resize(tuple(c["size"]), getattr(Image.Resampling, c["resize"].upper()))
 
 

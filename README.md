@@ -23,8 +23,9 @@ kiểm tra nạp mô hình thất bại, script dừng và hiển thị lỗi th
 
 Để dự đoán, chọn **Mô hình thật → ResNet50**, tải ảnh JPG/PNG và chạy dự đoán.
 Thứ tự nhãn đã cấu hình là **Glioma → Meningioma → No Tumor → Pituitary Tumor**.
-Các thông số RGB, bilinear 224 × 224 và chuẩn hóa ImageNet là hợp đồng đầu vào đang có;
-cần đối chiếu với `transforms.py` từ gói huấn luyện và cùng ảnh test để xác nhận.
+Các thông số RGB, bilinear 224 × 224 và chuẩn hóa ImageNet đã đối chiếu với mã gốc tại
+`training/mri_pipeline/`. Cấu hình ResNet50 dùng `exif_transpose: false` để giữ đúng hành vi
+của dataset huấn luyện, kể cả ảnh có cờ hướng EXIF.
 
 ## Khôi phục Git cho bản giải nén
 
@@ -46,8 +47,20 @@ và hoàn tất thiết lập nhánh bằng tay; không xóa `.git` để chạy
 Xem [notebooks/README.md](notebooks/README.md). Notebook đã được bỏ đầu ra và hình nhúng;
 giữ nguyên các ô nguồn. Kết quả bàn giao có 985 ảnh test, Accuracy 95,43% và Macro F1 94,65%.
 Đây là kết quả đọc từ file đánh giá gốc, không phải kết quả chạy lại trên máy này.
-Mã huấn luyện trong `mri_pipeline_phan2_Tri.zip`, checkpoint, dữ liệu và split chính thức
-chưa đi kèm repo; notebook một mình chưa đủ tái lập huấn luyện.
+Mã gốc trong `mri_pipeline_phan2_Tri.zip` đã được giải nén nguyên nội dung vào
+`training/mri_pipeline/`. Checkpoint được cài riêng trên máy tại `models/resnet50/model.pth`,
+không đưa vào Git. Dataset và split chính thức vẫn cần bàn giao để đánh giá lại toàn bộ tập test.
+
+Đối chiếu checkpoint đang cài với chính hàm dựng mô hình và phép tiền xử lý của mã gốc:
+
+```sh
+.venv312/bin/python scripts/verify_resnet50_pipeline.py
+```
+
+Mặc định lệnh dùng bốn đầu vào tổng hợp (PNG RGB, PNG xám, JPEG và JPEG có hướng EXIF).
+Kết quả đã chạy nằm ở `verification/resnet50_pipeline.json`: cả bốn trường hợp đạt,
+sai lệch xác suất tối đa dưới `1e-7`. Đây là đối chiếu kỹ thuật, không phải đánh giá accuracy MRI.
+Để đối chiếu một ảnh test thật, thêm `--image /duong/dan/anh.jpg`; có thể lặp tùy chọn này.
 
 Ngoài test ONNX bên dưới, kiểm tra riêng đường PyTorch bằng:
 
@@ -150,7 +163,7 @@ Ví dụ `model_config.json` **chỉ minh họa định dạng**, không dùng n
 ```
 
 - `size` là [rộng, cao]. Resize trực tiếp; hỗ trợ bilinear, bicubic, nearest và lanczos.
-- Ảnh được chỉnh hướng EXIF và chuyển RGB hoặc xám. Chuẩn hóa theo `(pixel * scale - mean) / std` rồi chuyển bố cục NCHW hoặc NHWC. Nếu ONNX đã chứa bước chuẩn hóa thì dùng scale=1, mean=0 và std=1 cho từng kênh.
+- Ảnh mặc định được chỉnh hướng EXIF rồi chuyển RGB hoặc xám; cấu hình `exif_transpose: false` tắt chỉnh hướng để khớp pipeline không xử lý EXIF. Chuẩn hóa theo `(pixel * scale - mean) / std` rồi chuyển bố cục NCHW hoặc NHWC. Nếu ONNX đã chứa bước chuẩn hóa thì dùng scale=1, mean=0 và std=1 cho từng kênh.
 - `labels` phải theo đúng thứ tự vector đầu ra của chính mô hình. `output_type` là `logits` nếu cần softmax hoặc `probabilities` nếu mô hình đã trả xác suất.
 - Đặt rõ tên input/output nếu model có nhiều output; app mặc định lấy cổng đầu tiên. Nếu notebook dùng crop, letterbox hoặc phép xử lý ngoài hợp đồng trên, bổ sung vào `predict()` trước khi đối chiếu.
 
