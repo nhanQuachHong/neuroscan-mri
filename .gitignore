@@ -1,0 +1,12 @@
+.DS_Store
+.venv/
+.venv312/
+__pycache__/
+*.pyc
+.env
+data/
+uploads/
+.source-assets/
+models/**/*.pth
+models/**/*.onnx
+*.pth

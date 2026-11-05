@@ -1,0 +1,35 @@
+{
+  "test_set_id": "BRISC · 985 ảnh (log Bước 9)",
+  "labels": [
+    "Glioma",
+    "Meningioma",
+    "No Tumor",
+    "Pituitary Tumor"
+  ],
+  "confusion_matrix": [
+    [
+      252,
+      1,
+      0,
+      0
+    ],
+    [
+      3,
+      253,
+      35,
+      3
+    ],
+    [
+      0,
+      1,
+      137,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      298
+    ]
+  ]
+}

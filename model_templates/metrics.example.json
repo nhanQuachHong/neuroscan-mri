@@ -1,0 +1,5 @@
+{
+  "test_set_id": "REPLACE_WITH_TEST_SET_ID",
+  "labels": ["Glioma", "Meningioma", "Pituitary Tumor", "No Tumor"],
+  "confusion_matrix": [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+}
