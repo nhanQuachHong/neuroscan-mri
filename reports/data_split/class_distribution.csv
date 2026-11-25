@@ -1,0 +1,6 @@
+label,test,train,All
+glioma,254,1147,1401
+meningioma,306,1329,1635
+no_tumor,140,1067,1207
+pituitary,300,1457,1757
+All,1000,5000,6000

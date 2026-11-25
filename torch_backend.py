@@ -1,4 +1,4 @@
-"""Reconstruct standard torchvision classifiers and load local state dictionaries."""
+"""Reconstruct standard torchvision/timm classifiers and load local state dictionaries."""
 from collections.abc import Mapping
 from functools import lru_cache
 import os
@@ -7,9 +7,13 @@ import os
 @lru_cache(maxsize=3)
 def load_model(path, modified, architecture):
     import torch
-    from torchvision import models
 
-    network = getattr(models, architecture)(weights=None, num_classes=4)
+    if architecture == "swin_tiny":
+        import timm
+        network = timm.create_model("swin_tiny_patch4_window7_224", pretrained=False, num_classes=4)
+    else:
+        from torchvision import models
+        network = getattr(models, architecture)(weights=None, num_classes=4)
     checkpoint = torch.load(path, map_location="cpu", weights_only=True)
     if isinstance(checkpoint, Mapping):
         for key in ("state_dict", "model_state_dict"):

@@ -1,0 +1,112 @@
+{
+  "model": "efficientnet_b0",
+  "accuracy": 0.9522842639593908,
+  "precision_macro": 0.9390980162884279,
+  "recall_macro": 0.9585725713210185,
+  "f1_macro": 0.9458979276067436,
+  "f1_weighted": 0.9525463710460214,
+  "per_class": {
+    "glioma": {
+      "precision": 0.9841897233201581,
+      "recall": 0.9841897233201581,
+      "f1-score": 0.9841897233201581,
+      "support": 253.0
+    },
+    "meningioma": {
+      "precision": 0.9732824427480916,
+      "recall": 0.8673469387755102,
+      "f1-score": 0.9172661870503597,
+      "support": 294.0
+    },
+    "no_tumor": {
+      "precision": 0.8154761904761905,
+      "recall": 0.9927536231884058,
+      "f1-score": 0.8954248366013072,
+      "support": 138.0
+    },
+    "pituitary": {
+      "precision": 0.9834437086092715,
+      "recall": 0.99,
+      "f1-score": 0.9867109634551495,
+      "support": 300.0
+    },
+    "accuracy": 0.9522842639593908,
+    "macro avg": {
+      "precision": 0.9390980162884279,
+      "recall": 0.9585725713210185,
+      "f1-score": 0.9458979276067436,
+      "support": 985.0
+    },
+    "weighted avg": {
+      "precision": 0.9570699137425733,
+      "recall": 0.9522842639593908,
+      "f1-score": 0.9525463710460214,
+      "support": 985.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      249,
+      4,
+      0,
+      0
+    ],
+    [
+      3,
+      255,
+      31,
+      5
+    ],
+    [
+      0,
+      1,
+      137,
+      0
+    ],
+    [
+      1,
+      2,
+      0,
+      297
+    ]
+  ],
+  "classes": [
+    "glioma",
+    "meningioma",
+    "no_tumor",
+    "pituitary"
+  ],
+  "train_time_sec": 1869.4,
+  "epochs_run": 56,
+  "best_epoch": 46,
+  "best_val_macro_f1": 0.9900891171468298,
+  "test_time_sec": 4.09,
+  "inference_ms_per_image_batched": 4.156,
+  "inference_ms_per_image_single": 11.839,
+  "num_params_million": 4.01,
+  "device": "Tesla T4",
+  "config": {
+    "model": "efficientnet_b0",
+    "split_csv": "/content/mri_pipeline/split.csv",
+    "data_root": "/kaggle/input/brisc2025",
+    "out_dir": "/content/drive/MyDrive/mri_project/outputs_scratch",
+    "epochs": 60,
+    "batch_size": 32,
+    "patience": 10,
+    "freeze_epochs": 0,
+    "head_lr": 0.001,
+    "optimizer": "adam",
+    "lr": 0.0003,
+    "weight_decay": 0.0,
+    "scheduler": "cosine",
+    "warmup_epochs": 0,
+    "class_weights": "auto",
+    "label_smoothing": 0.0,
+    "grad_clip": 1.0,
+    "num_workers": 2,
+    "seed": 42,
+    "no_amp": false,
+    "no_pretrained": true,
+    "max_batches": 0
+  }
+}

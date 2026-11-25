@@ -1,4 +1,4 @@
-"""NeuroScan Streamlit demo: dummy mode and locally exported ONNX models."""
+"""NeuroScan Streamlit demo: dummy mode and locally installed PyTorch/ONNX models."""
 from hashlib import sha256
 from io import BytesIO
 
@@ -7,9 +7,9 @@ import pandas as pd
 import streamlit as st
 from PIL import Image, ImageDraw, ImageOps
 
-from app import LABELS, MAX_BYTES, MODELS, config_for, metrics, predict, registry
+from app import LABELS, MAX_BYTES, MODELS, config_for, metrics, predict, registry, resized_image
 
-DUMMY_MODELS = ("MobileNetV2", "ResNet50", "EfficientNetB0")
+DUMMY_MODELS = ("ResNet50", "EfficientNetB0", "Swin Transformer")
 DEMO = "Minh họa (dummy)"
 REAL = "Mô hình thật"
 
@@ -71,7 +71,7 @@ else:
         if not item["ready"]:
             st.sidebar.warning(item["name"] + ": " + item["error"])
     if not available:
-        st.warning("Chưa có mô hình sẵn sàng. Thêm model.onnx và model_config.json vào models/.")
+        st.warning("Chưa có mô hình sẵn sàng. Thêm model.pth hoặc model.onnx và model_config.json vào models/.")
 
 left, right = st.columns(2)
 with left:
@@ -90,10 +90,10 @@ with left:
             if mode == DEMO or cfg:
                 size = cfg["size"] if cfg else [224, 224]
                 method = cfg["resize"] if cfg else "bilinear"
-                view = img.convert("L" if cfg and cfg["channels"] == 1 else "RGB")
                 with st.expander("Xem ảnh sau đổi kích thước"):
-                    st.image(view.resize(size, getattr(Image.Resampling, method.upper())),
-                             caption=f"{size[0]} × {size[1]} px", width=224)
+                    preview_img = resized_image(payload, cfg) if cfg else img.resize(
+                        size, getattr(Image.Resampling, method.upper()))
+                    st.image(preview_img, caption=f"{size[0]} × {size[1]} px", width=224)
                     if cfg:
                         st.caption(f"Tensor: {cfg['layout']} · {cfg['channels']} kênh")
         except (OSError, ValueError, Image.DecompressionBombError) as exc:

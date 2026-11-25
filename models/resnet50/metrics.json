@@ -1,5 +1,5 @@
 {
-  "test_set_id": "BRISC · 985 ảnh (log Bước 9)",
+  "test_set_id": "BRISC 2025 · split.csv (985 ảnh, from scratch)",
   "labels": [
     "Glioma",
     "Meningioma",
@@ -8,16 +8,16 @@
   ],
   "confusion_matrix": [
     [
-      252,
-      1,
+      235,
+      17,
       0,
-      0
+      1
     ],
     [
       3,
-      253,
-      35,
-      3
+      228,
+      52,
+      11
     ],
     [
       0,
@@ -26,10 +26,10 @@
       0
     ],
     [
+      1,
+      12,
       0,
-      2,
-      0,
-      298
+      287
     ]
   ]
 }

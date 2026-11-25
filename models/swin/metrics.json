@@ -1,0 +1,35 @@
+{
+  "test_set_id": "BRISC 2025 · split.csv (985 ảnh, from scratch)",
+  "labels": [
+    "Glioma",
+    "Meningioma",
+    "No Tumor",
+    "Pituitary Tumor"
+  ],
+  "confusion_matrix": [
+    [
+      156,
+      71,
+      1,
+      25
+    ],
+    [
+      17,
+      191,
+      56,
+      30
+    ],
+    [
+      3,
+      14,
+      120,
+      1
+    ],
+    [
+      14,
+      56,
+      3,
+      227
+    ]
+  ]
+}

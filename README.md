@@ -16,15 +16,17 @@ Script dùng Python 3.12, tự tạo `.venv312` và cài các thư viện còn t
 Mặc định dùng CPU. Dừng ứng dụng bằng Ctrl+C.
 
 Nếu chưa có checkpoint, giao diện vẫn mở ở chế độ minh họa và API thật báo thiếu mô hình.
-Đặt `resnet50_best.pth` của nhóm cạnh `Mo_NeuroScan.command` rồi mở lại; script sao chép
-checkpoint vào `models/resnet50/model.pth` nếu vị trí đó còn trống. Cũng có thể đặt trực tiếp
-file `model.pth` tại vị trí này. Không ghi đè checkpoint hiện có. Khi có checkpoint nhưng
-kiểm tra nạp mô hình thất bại, script dừng và hiển thị lỗi thay vì báo sẵn sàng giả.
+Đặt `resnet50_best.pth`, `efficientnet_b0_best.pth` và/hoặc `swin_tiny_best.pth` của nhóm cạnh
+`Mo_NeuroScan.command` rồi mở lại; script tự sao chép các checkpoint vào
+`models/resnet50/model.pth`, `models/efficientnet_b0/model.pth` và `models/swin/model.pth`
+nếu vị trí đích còn trống. Cũng có thể đặt trực tiếp file `model.pth` vào từng thư mục tương ứng.
+Không ghi đè checkpoint hiện có. Khi có checkpoint nhưng kiểm tra nạp mô hình thất bại, script dừng
+và hiển thị lỗi thay vì báo sẵn sàng giả.
 
-Để dự đoán, chọn **Mô hình thật → ResNet50**, tải ảnh JPG/PNG và chạy dự đoán.
-Thứ tự nhãn đã cấu hình là **Glioma → Meningioma → No Tumor → Pituitary Tumor**.
+Để dự đoán, chọn **Mô hình thật → ResNet50 / EfficientNetB0 / Swin Transformer**, tải ảnh JPG/PNG và chạy dự đoán hoặc sang mục **So sánh mô hình** để chạy đối chiếu cả 3 mô hình trên cùng một ảnh.
+Thứ tự nhãn đã cấu hình thống nhất cho cả 3 mô hình là **Glioma → Meningioma → No Tumor → Pituitary Tumor**.
 Các thông số RGB, bilinear 224 × 224 và chuẩn hóa ImageNet đã đối chiếu với mã gốc tại
-`training/mri_pipeline/`. Cấu hình ResNet50 dùng `exif_transpose: false` để giữ đúng hành vi
+`training/mri_pipeline/`. Cả 3 cấu hình dùng `exif_transpose: false` để giữ đúng hành vi
 của dataset huấn luyện, kể cả ảnh có cờ hướng EXIF.
 
 ## Khôi phục Git cho bản giải nén
@@ -42,24 +44,32 @@ mọi file làm việc; các khác biệt cục bộ vẫn xuất hiện trong `
 nếu đã có `.git`. Nếu mất mạng giữa chừng sau khi tạo `.git`, chạy `git fetch origin`
 và hoàn tất thiết lập nhánh bằng tay; không xóa `.git` để chạy lại nếu có lịch sử cần giữ.
 
-## Nguồn notebook và kết quả được bàn giao
+## Nguồn huấn luyện, split dữ liệu và kết quả bàn giao
 
-Xem [notebooks/README.md](notebooks/README.md). Notebook đã được bỏ đầu ra và hình nhúng;
-giữ nguyên các ô nguồn. Kết quả bàn giao có 985 ảnh test, Accuracy 95,43% và Macro F1 94,65%.
-Đây là kết quả đọc từ file đánh giá gốc, không phải kết quả chạy lại trên máy này.
-Mã gốc trong `mri_pipeline_phan2_Tri.zip` đã được giải nén nguyên nội dung vào
-`training/mri_pipeline/`. Checkpoint được cài riêng trên máy tại `models/resnet50/model.pth`,
-không đưa vào Git. Dataset và split chính thức vẫn cần bàn giao để đánh giá lại toàn bộ tập test.
+Xem [reports/README.md](reports/README.md) và [notebooks/README.md](notebooks/README.md).
+Tập chia chính thức (`split.csv` gồm 4.118 train / 727 val / 985 test) và các bảng kiểm tra dữ liệu
+được lưu tại `reports/data_split/`. Kết quả huấn luyện from scratch của cả 3 mô hình trên đúng cùng
+985 ảnh test được lưu tại `reports/from_scratch/` và ánh xạ vào `models/<id>/metrics.json`:
 
-Đối chiếu checkpoint đang cài với chính hàm dựng mô hình và phép tiền xử lý của mã gốc:
+| Mô hình | Thư mục | Accuracy | Precision Macro | Recall Macro | F1 Macro |
+| --- | --- | --- | --- | --- | --- |
+| **EfficientNetB0** | `models/efficientnet_b0` | 95,23% | 93,91% | 95,86% | 94,59% |
+| **ResNet50** | `models/resnet50` | 90,05% | 88,79% | 91,34% | 89,44% |
+| **Swin Transformer (`swin_tiny`)** | `models/swin` | 70,46% | 71,63% | 72,31% | 71,20% |
+
+Mã gốc trong `mri_pipeline_phan2_Tri.zip` nằm tại `training/mri_pipeline/`. Các file trọng số
+`models/*/model.pth` được cài cục bộ trên máy và không đưa vào Git. Kết quả lượt ResNet50 pretrained
+trước đó (985 ảnh test, Accuracy 95,43%, Macro F1 94,65%) vẫn được giữ tại `notebooks/resnet50_metrics.original.json`.
+
+Đối chiếu đồng thời cả 3 checkpoint đang cài với chính hàm dựng mô hình và phép tiền xử lý của mã gốc:
 
 ```sh
-.venv312/bin/python scripts/verify_resnet50_pipeline.py
+.venv312/bin/python scripts/verify_pipeline.py --model all --report verification/all_models_pipeline.json
 ```
 
 Mặc định lệnh dùng bốn đầu vào tổng hợp (PNG RGB, PNG xám, JPEG và JPEG có hướng EXIF).
-Kết quả đã chạy nằm ở `verification/resnet50_pipeline.json`: cả bốn trường hợp đạt,
-sai lệch xác suất tối đa dưới `1e-7`. Đây là đối chiếu kỹ thuật, không phải đánh giá accuracy MRI.
+Báo cáo đối chiếu lưu ở `verification/all_models_pipeline.json` (và `verification/resnet50_pipeline.json`
+cho lệnh cũ `scripts/verify_resnet50_pipeline.py`). Đây là đối chiếu kỹ thuật, không phải đánh giá lại accuracy MRI.
 Để đối chiếu một ảnh test thật, thêm `--image /duong/dan/anh.jpg`; có thể lặp tùy chọn này.
 
 Ngoài test ONNX bên dưới, kiểm tra riêng đường PyTorch bằng:
@@ -93,16 +103,17 @@ Hai API POST nhận bytes của ảnh JPG/PNG, tối đa 10 MB.
 1. Cài thêm `python -m pip install -r requirements-pytorch.txt`.
 2. Tạo từng thư mục riêng, ví dụ `models/resnet50/`, đặt checkpoint tên `model.pth`.
 3. Sao chép `model_templates/model_config.pytorch.example.json` thành `model_config.json`
-   cạnh checkpoint. Chọn `architecture`: `resnet50`, `efficientnet_b0`, hoặc đúng biến thể Swin
+   cạnh checkpoint. Chọn `architecture`: `resnet50`, `efficientnet_b0`, `swin_tiny` (`timm`
+   `swin_tiny_patch4_window7_224` theo `training/mri_pipeline/models.py`), hoặc biến thể Swin của torchvision
    (`swin_t`, `swin_s`, `swin_b`, `swin_v2_t`, `swin_v2_s`, `swin_v2_b`).
    Điền đúng kích thước, resize, chuẩn hóa và thứ tự nhãn theo notebook.
-4. Chạy `python app.py --verify-models`. Tải lại trang và chọn **Mô hình thật**.
+4. Chạy `python app.py --verify-models` (hoặc `--verify-ready` nếu mới đặt một phần checkpoint). Tải lại trang và chọn **Mô hình thật**.
    Dùng cùng ảnh kiểm tra để đối chiếu đầu ra với notebook.
 5. Thêm `metrics.json` nếu nhóm đã đánh giá trên tập test. Xem cấu trúc bên dưới.
 
-Backend dựng lại **kiến trúc torchvision chuẩn với đầu phân loại 4 lớp**. Checkpoint có thể
+Backend dựng lại **kiến trúc torchvision chuẩn và `swin_tiny` từ `timm` với đầu phân loại 4 lớp**. Checkpoint có thể
 là state_dict trực tiếp hoặc nằm trong trường state_dict/model_state_dict.
-Nếu nhóm dùng timm, kiến trúc tùy biến hoặc đầu phân loại khác, hãy xuất ONNX
+Nếu nhóm dùng kiến trúc tùy biến hoặc đầu phân loại khác, hãy xuất ONNX
 hoặc điều chỉnh bộ dựng mô hình tương ứng; chỉ đổi đuôi file sẽ không chạy được.
 Bản web so sánh tối đa ba gói mô hình trong models/.
 
@@ -213,9 +224,10 @@ bản đã resize trước khi chuẩn hóa tensor. Chế độ minh họa khôn
 đánh giá nghiên cứu. Mặc định PyTorch ưu tiên CUDA, sau đó MPS rồi CPU.
 Nếu gặp phép toán chưa được hỗ trợ trên MPS, khởi động với `NEUROSCAN_DEVICE=cpu`.
 
-## Gắn checkpoint ResNet50 của nhóm
+## Gắn 3 checkpoint PyTorch của nhóm
 
-Gói này có sẵn cấu hình và chỉ số ResNet50 của lượt đánh giá Bước 9. Đặt
-`resnet50_best.pth` của nhóm vào `models/resnet50/`, đổi tên thành `model.pth`,
-rồi chạy `python app.py --verify-models`. Tải lại giao diện và chọn **Mô hình thật**.
-Checkpoint được bàn giao riêng; không đưa vào Git.
+Gói này có sẵn cấu hình (`model_config.json`) và chỉ số đánh giá (`metrics.json`) của cả 3 mô hình
+(`resnet50`, `efficientnet_b0`, `swin`). Đặt các file `resnet50_best.pth`, `efficientnet_b0_best.pth`,
+`swin_tiny_best.pth` cạnh `Mo_NeuroScan.command` (hoặc chép trực tiếp thành `model.pth` trong từng
+thư mục tương ứng dưới `models/`), rồi chạy `python app.py --verify-models`. Tải lại giao diện và chọn **Mô hình thật**.
+Các file checkpoint được bàn giao riêng; không đưa vào Git.

@@ -66,9 +66,9 @@ def config_for(folder):
               f"{key} phải là chuỗi không rỗng hoặc null.")
     architecture = c.get("architecture")
     if architecture is not None:
-        check(architecture in ("resnet50", "efficientnet_b0", "swin_t", "swin_s", "swin_b",
+        check(architecture in ("resnet50", "efficientnet_b0", "swin_tiny", "swin_t", "swin_s", "swin_b",
                                "swin_v2_t", "swin_v2_s", "swin_v2_b"), "Kiến trúc PyTorch chưa được hỗ trợ.")
-        check(channels == 3 and c["layout"] == "NCHW", "Mô hình torchvision cần RGB và NCHW.")
+        check(channels == 3 and c["layout"] == "NCHW", "Mô hình PyTorch cần RGB và NCHW.")
     model = folder / ("model.pth" if architecture else "model.onnx")
     check(model.is_file(), f"Thiếu {model.name}.")
     check(model.stat().st_size > 0, f"{model.name} là file rỗng.")
@@ -242,15 +242,18 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--check-models", action="store_true", help="Kiểm tra các gói mô hình và thoát")
     parser.add_argument("--verify-models", action="store_true", help="Chạy thử từng mô hình bằng ảnh tổng hợp")
+    parser.add_argument("--verify-ready", action="store_true", help="Chạy thử các mô hình đã có file trọng số")
     args = parser.parse_args()
-    if args.check_models or args.verify_models:
+    if args.check_models or args.verify_models or args.verify_ready:
         entries = registry()
         if not entries:
             print("Chưa có gói mô hình trong models/.")
         passed = bool(entries)
+        ready_count = 0
         for entry in entries:
             error = entry.get("error")
-            if args.verify_models and entry["ready"]:
+            if (args.verify_models or args.verify_ready) and entry["ready"]:
+                ready_count += 1
                 try:
                     from PIL import Image
                     buffer = BytesIO()
@@ -258,9 +261,15 @@ if __name__ == "__main__":
                     predict(MODELS / entry["id"], buffer.getvalue())
                 except Exception as exc:
                     error = f"Chạy thử thất bại: {exc}"
-            passed &= not error
-            status = "Chạy thử mô hình thành công" if args.verify_models else "Đủ file và cấu hình hợp lệ"
+            if args.verify_ready:
+                if entry["ready"]:
+                    passed &= not error
+            else:
+                passed &= not error
+            status = "Chạy thử mô hình thành công" if (args.verify_models or args.verify_ready) else "Đủ file và cấu hình hợp lệ"
             print(f'{entry["id"]}: {error or status}')
+        if args.verify_ready and ready_count == 0:
+            passed = False
         sys.exit(0 if passed else 1)
     with ThreadingHTTPServer(("127.0.0.1", args.port), Handler) as server:
         print(f"NeuroScan: http://127.0.0.1:{server.server_port}", flush=True)

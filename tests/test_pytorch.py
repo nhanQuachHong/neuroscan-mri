@@ -105,6 +105,61 @@ class PyTorchApiTest(unittest.TestCase):
         self.assertEqual(status, 409)
         self.assertIn("error", result)
 
+    def test_efficientnet_and_swin_tiny_compare_matches_references(self):
+        if not importlib.util.find_spec("timm"):
+            self.skipTest("Requires timm from requirements-pytorch.txt")
+        import timm
+        from torchvision import models, transforms
+        from torch_backend import load_model
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            refs = {}
+            specs = [
+                ("resnet50", "resnet50"),
+                ("efficientnet_b0", "efficientnet_b0"),
+                ("swin", "swin_tiny"),
+            ]
+            for folder_id, arch in specs:
+                folder = root / folder_id
+                folder.mkdir()
+                cfg = json.loads((app.ROOT / "models" / folder_id / "model_config.json").read_text())
+                (folder / "model_config.json").write_text(json.dumps(cfg))
+                with self.torch.random.fork_rng():
+                    self.torch.manual_seed(42)
+                    if arch == "resnet50":
+                        ref = models.resnet50(weights=None, num_classes=4)
+                        ref.fc = self.torch.nn.Sequential(self.torch.nn.Dropout(0.3), ref.fc)
+                    elif arch == "efficientnet_b0":
+                        ref = models.efficientnet_b0(weights=None, num_classes=4)
+                    else:
+                        ref = timm.create_model("swin_tiny_patch4_window7_224", pretrained=False, num_classes=4)
+                ref.eval()
+                refs[cfg["name"]] = (ref, cfg)
+                self.torch.save({"model_name": arch, "state_dict": ref.state_dict()}, folder / "model.pth")
+
+            transform = transforms.Compose([
+                transforms.Resize((224, 224), interpolation=transforms.InterpolationMode.BILINEAR),
+                transforms.ToTensor(),
+                transforms.Normalize(self.config["mean"], self.config["std"]),
+            ])
+            tensor = transform(self.image).unsqueeze(0)
+            load_model.cache_clear()
+            with patch.object(app, "MODELS", root):
+                status, result = asyncio.run(post_image("/api/compare", self.payload))
+            load_model.cache_clear()
+            self.assertEqual(status, 200, result)
+            self.assertEqual(len(result["results"]), 3)
+            for row in result["results"]:
+                self.assertNotIn("error", row)
+                ref, cfg = refs[row["model"]]
+                with self.torch.inference_mode():
+                    expected = ref(tensor).softmax(dim=1)[0].numpy()
+                probs = {item["label"]: item["probability"] for item in row["ranked"]}
+                np.testing.assert_allclose(
+                    [probs[label] for label in cfg["labels"]], expected, atol=1e-5, rtol=1e-4
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

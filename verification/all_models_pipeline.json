@@ -1,0 +1,115 @@
+{
+  "status": "passed",
+  "inputs": "synthetic_fixtures",
+  "models": [
+    {
+      "model_id": "resnet50",
+      "architecture": "resnet50",
+      "status": "passed",
+      "epoch": 15,
+      "val_macro_f1": 0.9526339171410692,
+      "checkpoint_sha256": "86c99f4d426e5a2c7b6217a950f89fd0bb2153dbb04d9c728a7041cd642381cd",
+      "classes": [
+        "glioma",
+        "meningioma",
+        "no_tumor",
+        "pituitary"
+      ],
+      "cases": [
+        {
+          "input": "rgb_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 4.937827924322846e-11
+        },
+        {
+          "input": "grayscale_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 5.2349458101730306e-11
+        },
+        {
+          "input": "rgb_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 6.251177353533421e-11
+        },
+        {
+          "input": "exif_rotated_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 6.251177353533421e-11
+        }
+      ]
+    },
+    {
+      "model_id": "efficientnet_b0",
+      "architecture": "efficientnet_b0",
+      "status": "passed",
+      "epoch": 46,
+      "val_macro_f1": 0.9900891171468298,
+      "checkpoint_sha256": "dd81be930055b786ca8e8548274273016d3ef5ad9283521310cf638e9e54f6ba",
+      "classes": [
+        "glioma",
+        "meningioma",
+        "no_tumor",
+        "pituitary"
+      ],
+      "cases": [
+        {
+          "input": "rgb_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 7.177090263169328e-25
+        },
+        {
+          "input": "grayscale_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 4.10463198745805e-22
+        },
+        {
+          "input": "rgb_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 5.843983848936257e-22
+        },
+        {
+          "input": "exif_rotated_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 5.843983848936257e-22
+        }
+      ]
+    },
+    {
+      "model_id": "swin",
+      "architecture": "swin_tiny",
+      "status": "passed",
+      "epoch": 4,
+      "val_macro_f1": 0.7151913874533976,
+      "checkpoint_sha256": "055a2721cc40d3a5f325cfdbda2ccea81343ef7d579ed6819e1b74fc029c58a9",
+      "classes": [
+        "glioma",
+        "meningioma",
+        "no_tumor",
+        "pituitary"
+      ],
+      "cases": [
+        {
+          "input": "rgb_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 3.1353553198165685e-08
+        },
+        {
+          "input": "grayscale_png",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 7.358249065614331e-08
+        },
+        {
+          "input": "rgb_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 5.577058259653711e-08
+        },
+        {
+          "input": "exif_rotated_jpeg",
+          "max_tensor_difference": 7.152557373046875e-07,
+          "max_probability_difference": 5.577058259653711e-08
+        }
+      ]
+    }
+  ],
+  "limitation": "Technical parity only; no MRI accuracy evaluation was performed."
+}
