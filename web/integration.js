@@ -18,6 +18,9 @@
   const esc = value => String(value).replace(/[&<>"']/g, ch =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
   const pct = p => new Intl.NumberFormat('vi-VN', {style:'percent', maximumFractionDigits:2}).format(p);
+  const num = (v, d=2) => new Intl.NumberFormat('vi-VN', {maximumFractionDigits:d}).format(v);
+  const fmtMin = s => s != null ? num(s / 60, 1) + ' phút' : '—';
+  const fmtMs = v => v != null ? num(v, 2) + ' ms' : '—';
   const real = () => mode.value === 'real';
   const ready = () => models.filter(m => m.ready);
   const sample = () => preview.getAttribute('src')?.startsWith('data:');
@@ -55,15 +58,41 @@
       try {
         const d = await request('/api/metrics/' + encodeURIComponent(picker.value));
         if (ticket !== assessment || !real()) return;
+        const eff = d.efficiency || {};
+        const effHtml = Object.keys(eff).length ? (
+          '<h3>Hiệu quả tính toán</h3><div class="tablewrap"><table><tbody>' +
+          '<tr><th>Thời gian huấn luyện</th><td>' + esc(fmtMin(eff.train_time_sec)) + '</td>' +
+          '<th>Dự đoán (batch=1)</th><td>' + esc(fmtMs(eff.inference_ms_per_image_single)) + '</td></tr>' +
+          '<tr><th>Số tham số</th><td>' + (eff.num_params_million != null ? esc(num(eff.num_params_million, 2) + 'M') : '—') + '</td>' +
+          '<th>Epoch tốt nhất / tổng</th><td>' + (eff.best_epoch != null ? esc(eff.best_epoch + ' / ' + (eff.epochs_run ?? '—')) : '—') +
+          (eff.device ? ' · ' + esc(eff.device) : '') + '</td></tr></tbody></table></div>'
+        ) : '';
+        const perClassHtml = Array.isArray(d.per_class) ? (
+          '<h3>Chỉ số theo từng lớp</h3><div class="tablewrap"><table><thead><tr>' +
+          '<th>Lớp</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Số ảnh</th></tr></thead><tbody>' +
+          d.per_class.map(c => '<tr><td><b>' + esc(c.label) + '</b></td><td>' + pct(c.precision) + '</td><td>' +
+            pct(c.recall) + '</td><td>' + pct(c.f1) + '</td><td>' + c.support + '</td></tr>').join('') +
+          '</tbody></table></div>'
+        ) : '';
         target.innerHTML = '<p>Tập Test: <b>' + esc(d.test_set_id) + '</b> · ' + d.samples + ' ảnh</p>' +
           '<div class="tablewrap"><table><tbody>' + Object.entries(d.scores).map(([k,v]) =>
-            '<tr><th>' + esc(k) + '</th><td>' + pct(v) + '</td></tr>').join('') +
-          '</tbody></table></div><h3>Confusion Matrix</h3><p>Hàng: nhãn thực · Cột: nhãn dự đoán</p>' +
+            '<tr><th>' + esc(k) + '</th><td><b>' + pct(v) + '</b></td></tr>').join('') +
+          '</tbody></table></div>' + effHtml + perClassHtml +
+          '<h3>Confusion Matrix (Heatmap)</h3><p class="subtle">Hàng: nhãn thực · Cột: nhãn dự đoán · Số lượng và tỷ lệ theo hàng</p>' +
           '<div class="tablewrap"><table><thead><tr><th>Thực / dự đoán</th>' +
           d.labels.map(l => '<th>' + esc(l) + '</th>').join('') + '</tr></thead><tbody>' +
-          d.confusion_matrix.map((row,i) => '<tr><th>' + esc(d.labels[i]) + '</th>' +
-            row.map((n,j) => '<td' + (i===j ? ' style="background:#e1f3ef;font-weight:bold"' : '') + '>' + n + '</td>').join('') +
-            '</tr>').join('') + '</tbody></table></div>';
+          d.confusion_matrix.map((row,i) => {
+            const rowSum = row.reduce((a, b) => a + b, 0) || 1;
+            return '<tr><th>' + esc(d.labels[i]) + '</th>' + row.map((n,j) => {
+              const r = n / rowSum;
+              const bg = i === j
+                ? 'rgba(8,127,131,' + (0.15 + r * 0.75).toFixed(2) + ')'
+                : (n > 0 ? 'rgba(196,91,63,' + (0.08 + r * 0.55).toFixed(2) + ')' : '#fafcfd');
+              const fg = i === j && r > 0.55 ? '#ffffff' : '#102e42';
+              return '<td style="background:' + bg + ';color:' + fg + ';font-weight:' + (i===j ? '700' : '400') + '">' +
+                n + ' <span style="font-size:10px;opacity:.85">(' + pct(r) + ')</span></td>';
+            }).join('') + '</tr>';
+          }).join('') + '</tbody></table></div>';
       } catch (e) { if (ticket === assessment && real()) target.textContent = e.message; }
     }
     picker.onchange = update; update();
@@ -72,11 +101,18 @@
       if (!rows.length) { summary.textContent = 'Chưa có dữ liệu đánh giá.'; return; }
       const fields = ['Accuracy', 'Precision Macro', 'Recall Macro', 'F1-Score Macro'];
       summary.innerHTML = '<table><thead><tr><th>Mô hình</th><th>Tập Test</th>' +
-        fields.map(x => '<th>' + esc(x) + '</th>').join('') + '</tr></thead><tbody>' +
-        rows.map(r => '<tr><td>' + esc(r.model) + '</td><td>' +
-          esc(r.available ? r.test_set_id : 'Chưa có dữ liệu') + '</td>' +
-          fields.map(f => '<td>' + (r.available ? pct(r.scores[f]) : '—') + '</td>').join('') +
-          '</tr>').join('') + '</tbody></table><p>Chỉ đối chiếu trực tiếp nếu dùng cùng tập Test.</p>';
+        fields.map(x => '<th>' + esc(x) + '</th>').join('') +
+        '<th>Train</th><th>Dự đoán (T4)</th><th>Tham số</th></tr></thead><tbody>' +
+        rows.map(r => {
+          const eff = r.efficiency || {};
+          return '<tr><td><b>' + esc(r.model) + '</b></td><td>' +
+            esc(r.available ? r.test_set_id : 'Chưa có dữ liệu') + '</td>' +
+            fields.map(f => '<td>' + (r.available ? pct(r.scores[f]) : '—') + '</td>').join('') +
+            '<td>' + esc(r.available ? fmtMin(eff.train_time_sec) : '—') + '</td>' +
+            '<td>' + esc(r.available ? fmtMs(eff.inference_ms_per_image_single) : '—') + '</td>' +
+            '<td>' + esc(r.available && eff.num_params_million != null ? num(eff.num_params_million, 2) + 'M' : '—') + '</td>' +
+            '</tr>';
+        }).join('') + '</tbody></table><p class="subtle">Chỉ đối chiếu trực tiếp nếu dùng cùng tập Test.</p>';
     }).catch(e => { summary.textContent = e.message; });
   }
   function renderCompare() {
@@ -91,10 +127,15 @@
       try {
         const blob = await (await fetch(src)).blob();
         const {results} = await request('/api/compare', {method:'POST', body:blob});
-        const rows = results.map(d => d.error ? [d.model, '—', '—', d.error] :
-          [d.model, d.ranked[0].label, pct(d.ranked[0].probability), d.inference_ms + ' ms']);
+        const rows = results.map(d => d.error ? [d.model, '—', '—', '—', d.error] : [
+          d.model,
+          d.ranked[0].label,
+          pct(d.ranked[0].probability),
+          d.ranked.slice(0, 3).map(r => r.label + ' ' + pct(r.probability)).join(' · '),
+          d.inference_ms + ' ms'
+        ]);
         if (real() && generation === g && src === preview.getAttribute('src')) {
-          target.innerHTML = '<table><thead><tr><th>MÔ HÌNH</th><th>TOP-1</th><th>ĐIỂM</th><th>SUY LUẬN / TRẠNG THÁI</th></tr></thead><tbody>' +
+          target.innerHTML = '<table><thead><tr><th>MÔ HÌNH</th><th>TOP-1</th><th>ĐỘ TIN CẬY</th><th>TOP-3 DỰ ĐOÁN</th><th>THỜI GIAN / TRẠNG THÁI</th></tr></thead><tbody>' +
             rows.map(r => '<tr>' + r.map(v => '<td>' + esc(v) + '</td>').join('') + '</tr>').join('') + '</tbody></table>';
         }
       } catch (e) { target.textContent = e.message; }

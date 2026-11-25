@@ -177,10 +177,32 @@ def metrics(folder):
     ratio = lambda a, b: a / b if b else 0
     pr = [ratio(m[i][i], sum(r[i] for r in m)) for i in range(4)]
     re_ = [ratio(m[i][i], sum(m[i])) for i in range(4)]
-    return {"labels": LABELS, "confusion_matrix": m, "test_set_id": d["test_set_id"], "samples": n,
-            "scores": {"Accuracy": sum(m[i][i] for i in range(4)) / n,
-                       "Precision Macro": sum(pr) / 4, "Recall Macro": sum(re_) / 4,
-                       "F1-Score Macro": sum(ratio(2*p*r, p+r) for p, r in zip(pr, re_)) / 4}}
+    f1 = [ratio(2 * p * r, p + r) for p, r in zip(pr, re_)]
+    per_class = [
+        {"label": LABELS[i], "precision": pr[i], "recall": re_[i], "f1": f1[i], "support": sum(m[i])}
+        for i in range(4)
+    ]
+    result = {
+        "labels": LABELS,
+        "confusion_matrix": m,
+        "test_set_id": d["test_set_id"],
+        "samples": n,
+        "scores": {
+            "Accuracy": sum(m[i][i] for i in range(4)) / n,
+            "Precision Macro": sum(pr) / 4,
+            "Recall Macro": sum(re_) / 4,
+            "F1-Score Macro": sum(f1) / 4,
+        },
+        "per_class": per_class,
+    }
+    efficiency = {}
+    for key in ("train_time_sec", "inference_ms_per_image_single", "inference_ms_per_image_batched",
+                "num_params_million", "epochs_run", "best_epoch", "device", "training_mode"):
+        if key in d and d[key] is not None:
+            efficiency[key] = d[key]
+    if efficiency:
+        result["efficiency"] = efficiency
+    return result
 
 
 class Handler(BaseHTTPRequestHandler):

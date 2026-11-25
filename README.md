@@ -119,18 +119,28 @@ Bản web so sánh tối đa ba gói mô hình trong models/.
 
 ## Chạy bản Streamlit theo yêu cầu đồ án
 
+Trên Mac có thể mở nhanh bằng:
+
+```sh
+bash Mo_Streamlit.command
+```
+
+Hoặc chạy thủ công:
+
 ```sh
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements-streamlit.txt
+python -m pip install -r requirements-streamlit.txt -r requirements-pytorch.txt
 python -m streamlit run streamlit_app.py --server.address 127.0.0.1
 ```
 
 Mở địa chỉ Streamlit in trong Terminal (thường là http://127.0.0.1:8501).
-Chọn **Minh họa (dummy)**, bật **Dùng hình mô phỏng**, sau đó chạy dự đoán hoặc
-so sánh trên cùng ảnh. Chế độ minh họa có ba tên mô hình và chỉ số giả lập, không cần trọng số.
-Bộ cài Streamlit đã gồm ONNX Runtime. Để chạy thật, đặt gói mô hình
-như hướng dẫn bên dưới và chọn **Mô hình thật**. Có thể chọn tối đa ba mô hình mỗi lần so sánh.
+Nếu đã cài sẵn checkpoint trong `models/`, app mặc định bật **Mô hình thật**; ngược lại mở ở chế độ
+**Minh họa (dummy)** với 3 mô hình ResNet50, EfficientNetB0 và Swin Transformer.
+Bản Streamlit gồm 4 tab khớp đề cương: (1) Phân tích & Dự đoán (ảnh trước/sau tiền xử lý, nhãn dự đoán,
+độ tin cậy, thời gian dự đoán, Top-3), (2) So sánh 3 mô hình trên cùng ảnh kèm biểu đồ xác suất,
+(3) Đánh giá & Hiệu quả tính toán (bảng so sánh Accuracy/Precision/Recall/Macro F1/thời gian train/latency/tham số,
+heatmap Confusion Matrix, chỉ số từng lớp và Learning Curve theo epoch), và (4) Dữ liệu & Quy trình BRISC 2025.
 
 ## Gắn mô hình ONNX (phương án tương thích)
 

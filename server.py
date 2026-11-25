@@ -120,10 +120,14 @@ def metrics_overview():
     for item in core.registry():
         response = get_metrics(item["id"])
         if isinstance(response, JSONResponse):
-            rows.append({"model": item["name"], "available": False})
+            rows.append({"id": item["id"], "model": item["name"], "available": False})
         else:
-            rows.append({"model": item["name"], "available": True,
-                         "test_set_id": response["test_set_id"], "scores": response["scores"]})
+            row = {"id": item["id"], "model": item["name"], "available": True,
+                   "test_set_id": response["test_set_id"], "samples": response["samples"],
+                   "scores": response["scores"]}
+            if "efficiency" in response:
+                row["efficiency"] = response["efficiency"]
+            rows.append(row)
     return {"models": rows}
 
 

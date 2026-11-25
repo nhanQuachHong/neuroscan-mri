@@ -160,6 +160,14 @@ class PyTorchApiTest(unittest.TestCase):
                     [probs[label] for label in cfg["labels"]], expected, atol=1e-5, rtol=1e-4
                 )
 
+    def test_metrics_include_per_class_and_optional_efficiency(self):
+        data = app.metrics(app.ROOT / "models/efficientnet_b0")
+        self.assertEqual(len(data["per_class"]), 4)
+        self.assertAlmostEqual(sum(c["support"] for c in data["per_class"]), data["samples"])
+        self.assertIn("efficiency", data)
+        self.assertIn("train_time_sec", data["efficiency"])
+        self.assertIn("inference_ms_per_image_single", data["efficiency"])
+
 
 if __name__ == "__main__":
     unittest.main()

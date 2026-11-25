@@ -1,5 +1,13 @@
 {
   "test_set_id": "BRISC 2025 · split.csv (985 ảnh, from scratch)",
+  "training_mode": "from_scratch",
+  "device": "Tesla T4",
+  "epochs_run": 15,
+  "best_epoch": 15,
+  "train_time_sec": 538.7,
+  "inference_ms_per_image_single": 5.84,
+  "inference_ms_per_image_batched": 4.583,
+  "num_params_million": 23.52,
   "labels": [
     "Glioma",
     "Meningioma",
