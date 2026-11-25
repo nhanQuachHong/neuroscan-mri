@@ -100,12 +100,14 @@
     request('/api/metrics').then(({models: rows}) => {
       if (!rows.length) { summary.textContent = 'Chưa có dữ liệu đánh giá.'; return; }
       const fields = ['Accuracy', 'Precision Macro', 'Recall Macro', 'F1-Score Macro'];
-      summary.innerHTML = '<table><thead><tr><th>Mô hình</th><th>Tập Test</th>' +
+      summary.innerHTML = '<table><thead><tr><th>Mô hình</th><th>Chế độ train</th><th>Tập Test</th>' +
         fields.map(x => '<th>' + esc(x) + '</th>').join('') +
         '<th>Train</th><th>Dự đoán (T4)</th><th>Tham số</th></tr></thead><tbody>' +
         rows.map(r => {
           const eff = r.efficiency || {};
-          return '<tr><td><b>' + esc(r.model) + '</b></td><td>' +
+          const modeLabel = eff.training_mode === 'pretrained' ? 'Pretrained' :
+            eff.training_mode === 'from_scratch' ? 'From scratch' : '—';
+          return '<tr><td><b>' + esc(r.model) + '</b></td><td>' + esc(r.available ? modeLabel : '—') + '</td><td>' +
             esc(r.available ? r.test_set_id : 'Chưa có dữ liệu') + '</td>' +
             fields.map(f => '<td>' + (r.available ? pct(r.scores[f]) : '—') + '</td>').join('') +
             '<td>' + esc(r.available ? fmtMin(eff.train_time_sec) : '—') + '</td>' +

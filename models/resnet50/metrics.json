@@ -1,12 +1,12 @@
 {
-  "test_set_id": "BRISC 2025 · split.csv (985 ảnh, from scratch)",
-  "training_mode": "from_scratch",
+  "test_set_id": "BRISC 2025 · split.csv (985 ảnh)",
+  "training_mode": "pretrained",
   "device": "Tesla T4",
-  "epochs_run": 15,
-  "best_epoch": 15,
-  "train_time_sec": 538.7,
-  "inference_ms_per_image_single": 5.84,
-  "inference_ms_per_image_batched": 4.583,
+  "epochs_run": 14,
+  "best_epoch": 9,
+  "train_time_sec": 422.5,
+  "inference_ms_per_image_single": 6.679,
+  "inference_ms_per_image_batched": 4.628,
   "num_params_million": 23.52,
   "labels": [
     "Glioma",
@@ -16,16 +16,16 @@
   ],
   "confusion_matrix": [
     [
-      235,
-      17,
+      252,
+      1,
       0,
-      1
+      0
     ],
     [
       3,
-      228,
-      52,
-      11
+      253,
+      35,
+      3
     ],
     [
       0,
@@ -34,10 +34,10 @@
       0
     ],
     [
-      1,
-      12,
       0,
-      287
+      2,
+      0,
+      298
     ]
   ]
 }

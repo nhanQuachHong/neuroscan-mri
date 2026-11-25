@@ -17,7 +17,7 @@ DEMO = "Minh họa (dummy)"
 REAL = "Mô hình thật"
 REPORTS = ROOT / "reports"
 HISTORY_MAP = {
-    "resnet50": REPORTS / "from_scratch/resnet50/resnet50_history.json",
+    "resnet50": REPORTS / "pretrained/resnet50/resnet50_history.json",
     "efficientnet_b0": REPORTS / "from_scratch/efficientnet_b0/efficientnet_b0_history.json",
     "swin": REPORTS / "from_scratch/swin_tiny/swin_tiny_history.json",
 }
@@ -298,8 +298,12 @@ with tab_eval:
         except (FileNotFoundError, ValueError, TypeError, OSError, KeyError):
             continue
         eff = d.get("efficiency", {})
+        mode_tag = {"pretrained": "Pretrained", "from_scratch": "From scratch"}.get(
+            eff.get("training_mode"), "—"
+        )
         overview_rows.append({
             "Mô hình": item["name"],
+            "Chế độ train": mode_tag,
             "Tập Test": d["test_set_id"],
             "Accuracy": f"{d['scores']['Accuracy']:.2%}",
             "Precision Macro": f"{d['scores']['Precision Macro']:.2%}",

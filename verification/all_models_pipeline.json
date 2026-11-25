@@ -6,9 +6,9 @@
       "model_id": "resnet50",
       "architecture": "resnet50",
       "status": "passed",
-      "epoch": 15,
-      "val_macro_f1": 0.9526339171410692,
-      "checkpoint_sha256": "86c99f4d426e5a2c7b6217a950f89fd0bb2153dbb04d9c728a7041cd642381cd",
+      "epoch": 9,
+      "val_macro_f1": 0.9930088524628637,
+      "checkpoint_sha256": "778e5c3e901d26507c901f9b34a5b4fdd0f387f1d420e3a086c93184ef034648",
       "classes": [
         "glioma",
         "meningioma",
@@ -19,22 +19,22 @@
         {
           "input": "rgb_png",
           "max_tensor_difference": 7.152557373046875e-07,
-          "max_probability_difference": 4.937827924322846e-11
+          "max_probability_difference": 1.2688284989243522e-25
         },
         {
           "input": "grayscale_png",
           "max_tensor_difference": 7.152557373046875e-07,
-          "max_probability_difference": 5.2349458101730306e-11
+          "max_probability_difference": 8.527337558295045e-08
         },
         {
           "input": "rgb_jpeg",
           "max_tensor_difference": 7.152557373046875e-07,
-          "max_probability_difference": 6.251177353533421e-11
+          "max_probability_difference": 1.8937655776873896e-08
         },
         {
           "input": "exif_rotated_jpeg",
           "max_tensor_difference": 7.152557373046875e-07,
-          "max_probability_difference": 6.251177353533421e-11
+          "max_probability_difference": 1.8937655776873896e-08
         }
       ]
     },

@@ -1,0 +1,22 @@
+{
+  "classes": [
+    "glioma",
+    "meningioma",
+    "no_tumor",
+    "pituitary"
+  ],
+  "weights": [
+    1.059156,
+    0.999515,
+    1.146437,
+    0.845238
+  ],
+  "train_counts": {
+    "glioma": 972,
+    "meningioma": 1030,
+    "no_tumor": 898,
+    "pituitary": 1218
+  },
+  "imbalance_ratio": 1.356,
+  "method": "sklearn compute_class_weight('balanced') trên tập Train"
+}

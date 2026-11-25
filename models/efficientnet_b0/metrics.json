@@ -1,5 +1,5 @@
 {
-  "test_set_id": "BRISC 2025 · split.csv (985 ảnh, from scratch)",
+  "test_set_id": "BRISC 2025 · split.csv (985 ảnh)",
   "training_mode": "from_scratch",
   "device": "Tesla T4",
   "epochs_run": 56,
