@@ -18,7 +18,7 @@ REAL = "Mô hình thật"
 REPORTS = ROOT / "reports"
 HISTORY_MAP = {
     "resnet50": REPORTS / "pretrained/resnet50/resnet50_history.json",
-    "efficientnet_b0": REPORTS / "from_scratch/efficientnet_b0/efficientnet_b0_history.json",
+    "efficientnet_b0": REPORTS / "pretrained/efficientnet_b0/efficientnet_b0_history.json",
     "swin": REPORTS / "from_scratch/swin_tiny/swin_tiny_history.json",
 }
 

@@ -1,0 +1,42 @@
+===== efficientnet_b0 | device=cuda | AMP=True =====
+Cấu hình: {'model': 'efficientnet_b0', 'split_csv': '/content/mri_pipeline/split.csv', 'data_root': '/kaggle/input/brisc2025', 'out_dir': '/content/drive/MyDrive/mri_project/outputs', 'epochs': 30, 'batch_size': 32, 'patience': 5, 'freeze_epochs': 3, 'head_lr': 0.001, 'optimizer': 'adam', 'lr': 0.0003, 'weight_decay': 0.0, 'scheduler': 'cosine', 'warmup_epochs': 0, 'class_weights': 'auto', 'label_smoothing': 0.0, 'grad_clip': 1.0, 'num_workers': 2, 'seed': 42, 'no_amp': False, 'no_pretrained': False, 'max_batches': 0}
+Số ảnh: train=4118, val=727, test=985
+Class Weight: {'glioma': 1.059156, 'meningioma': 0.999515, 'no_tumor': 1.146437, 'pituitary': 0.845238}
+Số tham số: 4.01M
+-- Giai đoạn 'head': lr=0.001, tham số được train=0.01M
+Epoch   1/30 [head] lr=1.00e-03 | train loss 0.6616 acc 0.7904 | val loss 0.3909 acc 0.8941 F1 0.8946 | 33s *
+Epoch   2/30 [head] lr=1.00e-03 | train loss 0.3931 acc 0.8681 | val loss 0.3324 acc 0.9010 F1 0.9009 | 31s *
+Epoch   3/30 [head] lr=1.00e-03 | train loss 0.3575 acc 0.8800 | val loss 0.3039 acc 0.9023 F1 0.9023 | 32s *
+-- Giai đoạn 'full': lr=0.0003, tham số được train=4.01M
+Epoch   4/30 [full] lr=3.00e-04 | train loss 0.2372 acc 0.9153 | val loss 0.3236 acc 0.8872 F1 0.8866 | 37s 
+Epoch   5/30 [full] lr=2.99e-04 | train loss 0.1198 acc 0.9587 | val loss 0.0842 acc 0.9766 F1 0.9766 | 35s *
+Epoch   6/30 [full] lr=2.96e-04 | train loss 0.0826 acc 0.9740 | val loss 0.0945 acc 0.9739 F1 0.9742 | 34s 
+Epoch   7/30 [full] lr=2.91e-04 | train loss 0.0596 acc 0.9832 | val loss 0.0623 acc 0.9780 F1 0.9782 | 34s *
+Epoch   8/30 [full] lr=2.84e-04 | train loss 0.0392 acc 0.9886 | val loss 0.0991 acc 0.9849 F1 0.9847 | 36s *
+Epoch   9/30 [full] lr=2.76e-04 | train loss 0.0432 acc 0.9879 | val loss 0.0407 acc 0.9876 F1 0.9878 | 34s *
+Epoch  10/30 [full] lr=2.65e-04 | train loss 0.0263 acc 0.9920 | val loss 0.0551 acc 0.9849 F1 0.9846 | 34s 
+Epoch  11/30 [full] lr=2.53e-04 | train loss 0.0249 acc 0.9932 | val loss 0.0724 acc 0.9904 F1 0.9902 | 35s *
+Epoch  12/30 [full] lr=2.40e-04 | train loss 0.0149 acc 0.9956 | val loss 0.0646 acc 0.9904 F1 0.9903 | 35s *
+Epoch  13/30 [full] lr=2.26e-04 | train loss 0.0221 acc 0.9944 | val loss 0.0492 acc 0.9904 F1 0.9903 | 35s 
+Epoch  14/30 [full] lr=2.10e-04 | train loss 0.0106 acc 0.9976 | val loss 0.0479 acc 0.9917 F1 0.9920 | 34s *
+Epoch  15/30 [full] lr=1.94e-04 | train loss 0.0051 acc 0.9981 | val loss 0.0277 acc 0.9931 F1 0.9933 | 37s *
+Epoch  16/30 [full] lr=1.77e-04 | train loss 0.0089 acc 0.9961 | val loss 0.0449 acc 0.9931 F1 0.9935 | 35s *
+Epoch  17/30 [full] lr=1.60e-04 | train loss 0.0057 acc 0.9983 | val loss 0.0557 acc 0.9917 F1 0.9918 | 35s 
+Epoch  18/30 [full] lr=1.43e-04 | train loss 0.0056 acc 0.9981 | val loss 0.0332 acc 0.9931 F1 0.9932 | 36s 
+Epoch  19/30 [full] lr=1.26e-04 | train loss 0.0073 acc 0.9976 | val loss 0.0333 acc 0.9931 F1 0.9933 | 34s 
+Epoch  20/30 [full] lr=1.09e-04 | train loss 0.0043 acc 0.9983 | val loss 0.0292 acc 0.9945 F1 0.9946 | 34s *
+Epoch  21/30 [full] lr=9.27e-05 | train loss 0.0044 acc 0.9978 | val loss 0.0317 acc 0.9904 F1 0.9906 | 35s 
+Epoch  22/30 [full] lr=7.73e-05 | train loss 0.0030 acc 0.9985 | val loss 0.0359 acc 0.9931 F1 0.9935 | 35s 
+Epoch  23/30 [full] lr=6.28e-05 | train loss 0.0016 acc 0.9995 | val loss 0.0408 acc 0.9931 F1 0.9935 | 34s 
+Epoch  24/30 [full] lr=4.96e-05 | train loss 0.0033 acc 0.9988 | val loss 0.0445 acc 0.9904 F1 0.9906 | 34s 
+Epoch  25/30 [full] lr=3.77e-05 | train loss 0.0029 acc 0.9985 | val loss 0.0426 acc 0.9917 F1 0.9920 | 36s 
+Early stopping: Val Macro F1 không tăng sau 5 epoch
+Tổng thời gian huấn luyện: 14.4 phút | epoch tốt nhất: 20 (Val Macro F1 = 0.9946)
+TEST | acc 0.9706 | precision 0.9616 | recall 0.9751 | macro F1 0.9672
+Thời gian dự đoán: 8.22 ms/ảnh (batch=1)
+Confusion Matrix (hàng = thật, cột = dự đoán, thứ tự glioma, meningioma, no_tumor, pituitary):
+     251     2     0     0
+       4   269    17     4
+       0     0   138     0
+       1     1     0   298
+Đã lưu kết quả vào /content/drive/MyDrive/mri_project/outputs/efficientnet_b0

@@ -53,8 +53,8 @@ Tập chia chính thức (`split.csv` gồm 4.118 train / 727 val / 985 test) v�
 
 | Mô hình | Chế độ train | Thư mục | Accuracy | Precision Macro | Recall Macro | F1 Macro |
 | --- | --- | --- | --- | --- | --- | --- |
-| **ResNet50** | Pretrained ImageNet | `models/resnet50` | **95,43%** | **93,98%** | **96,07%** | **94,65%** |
-| **EfficientNetB0** | From scratch | `models/efficientnet_b0` | 95,23% | 93,91% | 95,86% | 94,59% |
+| **EfficientNetB0** | Pretrained ImageNet | `models/efficientnet_b0` | **97,06%** | **96,16%** | **97,51%** | **96,72%** |
+| **ResNet50** | Pretrained ImageNet | `models/resnet50` | 95,43% | 93,98% | 96,07% | 94,65% |
 | **Swin Transformer (`swin_tiny`)** | From scratch | `models/swin` | 70,46% | 71,63% | 72,31% | 71,20% |
 
 Mã gốc trong `mri_pipeline_phan2_Tri.zip` nằm tại `training/mri_pipeline/`. Các file trọng số
